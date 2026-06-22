@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网上订餐系统 - 后台管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; background: #f0f2f5; color: #333; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 220px; background: linear-gradient(180deg, #1a1a2e, #16213e); color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar h2 { padding: 15px 25px; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-item { padding: 12px 25px; cursor: pointer; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: #f7931e; }
+        .main { margin-left: 220px; flex: 1; padding: 25px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .page-header h2 { font-size: 22px; }
+        .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; font-weight: 500; }
+        .btn-primary { background: #ff6b35; color: white; }
+        .btn-primary:hover { background: #e55a2b; }
+        .btn-danger { background: #ff4757; color: white; }
+        .btn-success { background: #2ed573; color: white; }
+        .btn-info { background: #1e90ff; color: white; }
+        .btn-warning { background: #ffa502; color: white; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .stat-card .label { font-size: 13px; color: #999; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; }
+        .stat-card:nth-child(1) .value { color: #ff6b35; }
+        .stat-card:nth-child(2) .value { color: #1e90ff; }
+        .stat-card:nth-child(3) .value { color: #2ed573; }
+        .stat-card:nth-child(4) .value { color: #a55eea; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+        th { background: #fafafa; font-weight: 600; color: #666; }
+        tr:hover { background: #fafafa; }
+        .badge { padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-purple { background: #e2d5f1; color: #6f42c1; }
+        .badge-primary { background: #cce5ff; color: #004085; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 12px; padding: 25px; width: 480px; max-width: 90%; }
+        .modal h3 { margin-bottom: 20px; font-size: 18px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #666; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: #ff6b35; }
+        .img-upload-area { display: flex; align-items: center; gap: 12px; }
+        .img-preview { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; background: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 24px; overflow: hidden; }
+        .img-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #2ed573; color: white; border-radius: 8px; z-index: 300; transform: translateX(120%); transition: transform 0.3s; font-size: 14px; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: #ff4757; }
+        .login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1a1a2e, #16213e); }
+        .login-box { background: white; border-radius: 16px; padding: 40px; width: 380px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .login-box h2 { text-align: center; margin-bottom: 25px; color: #1a1a2e; }
+    </style>
+</head>
+<body>
+    <div id="loginPage" class="login-page">
+        <div class="login-box">
+            <h2>🔧 后台管理登录</h2>
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" id="loginUsername" value="admin">
+            </div>
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="loginPassword" value="admin123">
+            </div>
+            <button class="btn btn-primary" style="width:100%;padding:12px;font-size:15px;margin-top:10px" onclick="adminLogin()">登录</button>
+        </div>
+    </div>
+
+    <div id="adminPage" style="display:none">
+        <div class="layout">
+            <div class="sidebar">
+                <h2>🍽️ 订餐后台</h2>
+                <div class="nav-item active" onclick="switchSection('dashboard')">📊 数据概览</div>
+                <div class="nav-item" onclick="switchSection('categories')">📂 分类管理</div>
+                <div class="nav-item" onclick="switchSection('dishes')">🍕 菜品管理</div>
+                <div class="nav-item" onclick="switchSection('orders')">📋 订单管理</div>
+                <div class="nav-item" onclick="switchSection('users')">👥 用户管理</div>
+                <div class="nav-item" style="margin-top:30px;border-top:1px solid rgba(255,255,255,0.1);padding-top:15px" onclick="adminLogout()">🚪 退出登录</div>
+            </div>
+            <div class="main">
+                <div id="dashboardSection" class="section active"></div>
+                <div id="categoriesSection" class="section"></div>
+                <div id="dishesSection" class="section"></div>
+                <div id="ordersSection" class="section"></div>
+                <div id="usersSection" class="section"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3 id="modalTitle"></h3>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn" style="background:#eee" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" id="modalSaveBtn" onclick="modalSave()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API = '/api';
+        let token = null;
+        let currentSection = 'dashboard';
+        let modalCallback = null;
+
+        async function api(path, options = {}) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            const res = await fetch(API + path, { ...options, headers });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || '请求失败');
+            return data;
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => t.className = 'toast', 2500);
+        }
+
+        async function adminLogin() {
+            try {
+                const data = await api('/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username: document.getElementById('loginUsername').value,
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                if (data.user.role !== 'admin') throw new Error('非管理员账号');
+                token = data.token;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('adminPage').style.display = 'block';
+                loadDashboard();
+            } catch (e) { showToast(e.message, true); }
+        }
+
+        function adminLogout() {
+            token = null;
+            document.getElementById('adminPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+        }
+
+        function switchSection(name) {
+            currentSection = name;
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(name + 'Section').classList.add('active');
+            const loaders = { dashboard: loadDashboard, categories: loadCategories, dishes: loadDishes, orders: loadOrders, users: loadUsers };
+            if (loaders[name]) loaders[name]();
+        }
+
+        async function loadDashboard() {
+            try {
+                const [dishes, orders, users, categories] = await Promise.all([
+                    api('/admin/dishes'),
+                    api('/admin/orders'),
+                    api('/admin/users'),
+                    api('/categories')
+                ]);
+                const pending = orders.filter(o => o.status === 'pending').length;
+                const todayTotal = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + o.total, 0);
+                document.getElementById('dashboardSection').innerHTML = `
+                    <div class="page-header"><h2>数据概览</h2></div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="label">菜品总数</div><div class="value">${dishes.length}</div></div>
+                        <div class="stat-card"><div class="label">订单总数</div><div class="value">${orders.length}</div></div>
+                        <div class="stat-card"><div class="label">营业额</div><div class="value">¥${todayTotal.toFixed(0)}</div></div>
+                        <div class="stat-card"><div class="label">待处理</div><div class="value">${pending}</div></div>
+                    </div>
+                    <div class="card">
+                        <h3 style="margin-bottom:15px">最近订单</h3>
+                        <table>
+                            <tr><th>订单号</th><th>用户</th><th>金额</th><th>状态</th><th>时间</th></tr>
+                            ${orders.slice(0, 10).map(o => `
+                                <tr>
+                                    <td>#${String(o.id).padStart(6,'0')}</td>
+                                    <td>${o.user?.username || '-'}</td>
+                                    <td>¥${o.total.toFixed(2)}</td>
+                                    <td><span class="badge badge-${getStatusBadge(o.status)}">${getStatusText(o.status)}</span></td>
+                                    <td>-</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                `;
+            } catch (e) { showToast(e.message, true); }
+        }
+
+        function getStatusText(s) { return {pending:'待处理',confirmed:'已确认',preparing:'制作中',delivering:'配送中',completed:'已完成',cancelled:'已取消'}[s] || s; }
+        function getStatusBadge(s) { return {pending:'warning',confirmed:'info',preparing:'purple',delivering:'success',completed:'primary',cancelled:'danger'}[s] || 'info'; }
+
+        async function loadCategories() {
+            try {
+                const cats = await api('/categories');
+                document.getElementById('categoriesSection').innerHTML = `
+                    <div class="page-header"><h2>分类管理</h2><button class="btn btn-primary" onclick="showCategoryModal()">+ 新增分类</button></div>
+                    <div class="card">
+                        <table>
+                            <tr><th>ID</th><th>分类名称</th><th>排序</th><th>操作</th></tr>
+                            ${cats.map(c => `
+                                <tr>
+                                    <td>${c.id}</td><td>${c.name}</td><td>${c.sort}</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" onclick='editCategory(${JSON.stringify(c)})'>编辑</button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">删除</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                `;
+            } catch (e) { showToast(e.message, true); }
+        }
+
+        function showCategoryModal(cat = null) {
+            document.getElementById('modalTitle').textContent = cat ? '编辑分类' : '新增分类';
+            document.getElementById('modalBody').innerHTML = `
+                <div class="form-group"><label>分类名称</label><input id="m_catName" value="${cat ? cat.name : ''}"></div>
+                <div class="form-group"><label>排序</label><input type="number" id="m_catSort" value="${cat ? cat.sort : 0}"></div>
+            `;
+            modalCallback = async () => {
+                const body = { name: document.getElementById('m_catName').value, sort: parseInt(document.getElementById('m_catSort').value) || 0 };
+                if (cat) await api(`/admin/categories/${cat.id}`, { method: 'PUT', body: JSON.stringify(body) });
+                else await api('/admin/categories', { method: 'POST', body: JSON.stringify(body) });
+                loadCategories();
+            };
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function editCategory(cat) { showCategoryModal(cat); }
+
+        async function deleteCategory(id) {
+            if (!confirm('确定删除此分类？')) return;
+            try { await api(`/admin/categories/${id}`, { method: 'DELETE' }); loadCategories(); showToast('删除成功'); }
+            catch (e) { showToast(e.message, true); }
+        }
+
+        async function loadDishes() {
+            try {
+                const [dishes, cats] = await Promise.all([api('/admin/dishes'), api('/categories')]);
+                const catMap = {};
+                cats.forEach(c => catMap[c.id] = c.name);
+                document.getElementById('dishesSection').innerHTML = `
+                    <div class="page-header"><h2>菜品管理</h2><button class="btn btn-primary" onclick="showDishModal()">+ 新增菜品</button></div>
+                    <div class="card">
+                        <table>
+                            <tr><th>ID</th><th>图片</th><th>名称</th><th>分类</th><th>价格</th><th>状态</th><th>操作</th></tr>
+                            ${dishes.map(d => `
+                                <tr>
+                                    <td>${d.id}</td>
+                                    <td>${d.image ? `<img src="${d.image}" class="thumb">` : '<span style="color:#ccc">-</span>'}</td>
+                                    <td>${d.name}</td><td>${catMap[d.category_id] || '-'}</td>
+                                    <td>¥${d.price.toFixed(2)}</td>
+                                    <td><span class="badge ${d.status ? 'badge-success' : 'badge-danger'}">${d.status ? '上架' : '下架'}</span></td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" onclick='editDish(${JSON.stringify(d).replace(/'/g,"&#39;")})'>编辑</button>
+                                        <button class="btn btn-sm ${d.status ? 'btn-warning' : 'btn-success'}" onclick="toggleDish(${d.id},${!d.status})">${d.status ? '下架' : '上架'}</button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteDish(${d.id})">删除</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                `;
+            } catch (e) { showToast(e.message, true); }
+        }
+
+        async function showDishModal(dish = null) {
+            const cats = await api('/categories');
+            document.getElementById('modalTitle').textContent = dish ? '编辑菜品' : '新增菜品';
+            document.getElementById('modalBody').innerHTML = `
+                <div class="form-group"><label>菜品名称</label><input id="m_dishName" value="${dish ? dish.name : ''}"></div>
+                <div class="form-group"><label>价格</label><input type="number" step="0.01" id="m_dishPrice" value="${dish ? dish.price : ''}"></div>
+                <div class="form-group"><label>分类</label><select id="m_dishCat">${cats.map(c => `<option value="${c.id}" ${dish && dish.category_id === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div>
+                <div class="form-group"><label>描述</label><textarea id="m_dishDesc" rows="3">${dish ? (dish.desc || '') : ''}</textarea></div>
+                <div class="form-group">
+                    <label>菜品图片</label>
+                    <div class="img-upload-area">
+                        <div class="img-preview" id="imgPreview">${dish && dish.image ? `<img src="${dish.image}">` : '🖼'}</div>
+                        <div style="flex:1">
+                            <input type="file" id="m_dishFile" accept="image/*" onchange="previewImage(this)" style="font-size:12px">
+                            <div style="font-size:11px;color:#999;margin-top:4px">支持 JPG/PNG，或直接输入图片URL：</div>
+                            <input id="m_dishImg" value="${dish ? (dish.image || '') : ''}" placeholder="图片URL" style="margin-top:4px">
+                        </div>
+                    </div>
+                </div>
+            `;
+            modalCallback = async () => {
+                // 如果选择了文件，先上传图片
+                const fileInput = document.getElementById('m_dishFile');
+                if (fileInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('image', fileInput.files[0]);
+                    try {
+                        const res = await fetch('/api/admin/upload', {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer ' + token },
+                            body: formData
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            document.getElementById('m_dishImg').value = data.url;
+                        } else {
+                            throw new Error(data.error || '图片上传失败');
+                        }
+                    } catch (e) { showToast(e.message, true); return; }
+                }
+                const body = {
+                    name: document.getElementById('m_dishName').value,
+                    price: parseFloat(document.getElementById('m_dishPrice').value),
+                    category_id: parseInt(document.getElementById('m_dishCat').value),
+                    desc: document.getElementById('m_dishDesc').value,
+                    image: document.getElementById('m_dishImg').value
+                };
+                if (dish) await api(`/admin/dishes/${dish.id}`, { method: 'PUT', body: JSON.stringify(body) });
+                else await api('/admin/dishes', { method: 'POST', body: JSON.stringify(body) });
+                loadDishes();
+            };
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function editDish(dish) { showDishModal(dish); }
+
+        function previewImage(input) {
+            const preview = document.getElementById('imgPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}">`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function toggleDish(id, status) {
+            try { await api(`/admin/dishes/${id}`, { method: 'PUT', body: JSON.stringify({ status }) }); loadDishes(); }
+            catch (e) { showToast(e.message, true); }
+        }
+
+        async function deleteDish(id) {
+            if (!confirm('确定删除此菜品？')) return;
+            try { await api(`/admin/dishes/${id}`, { method: 'DELETE' }); loadDishes(); showToast('删除成功'); }
+            catch (e) { showToast(e.message, true); }
+        }
+
+        async function loadOrders() {
+            try {
+                const orders = await api('/admin/orders');
+                document.getElementById('ordersSection').innerHTML = `
+                    <div class="page-header"><h2>订单管理</h2></div>
+                    <div class="card">
+                        <table>
+                            <tr><th>订单号</th><th>用户</th><th>菜品</th><th>金额</th><th>状态</th><th>地址</th><th>操作</th></tr>
+                            ${orders.map(o => `
+                                <tr>
+                                    <td>#${String(o.id).padStart(6,'0')}</td>
+                                    <td>${o.user?.username || '-'}</td>
+                                    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items.map(i => i.dish_name + 'x' + i.count).join(', ')}</td>
+                                    <td>¥${o.total.toFixed(2)}</td>
+                                    <td><span class="badge badge-${getStatusBadge(o.status)}">${getStatusText(o.status)}</span></td>
+                                    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${o.address || '-'}</td>
+                                    <td>
+                                        <select onchange="updateOrderStatus(${o.id}, this.value)" style="padding:4px 8px;border-radius:4px;border:1px solid #ddd;font-size:12px">
+                                            <option value="pending" ${o.status==='pending'?'selected':''}>待处理</option>
+                                            <option value="confirmed" ${o.status==='confirmed'?'selected':''}>已确认</option>
+                                            <option value="preparing" ${o.status==='preparing'?'selected':''}>制作中</option>
+                                            <option value="delivering" ${o.status==='delivering'?'selected':''}>配送中</option>
+                                            <option value="completed" ${o.status==='completed'?'selected':''}>已完成</option>
+                                            <option value="cancelled" ${o.status==='cancelled'?'selected':''}>已取消</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                `;
+            } catch (e) { showToast(e.message, true); }
+        }
+
+        async function updateOrderStatus(id, status) {
+            try { await api(`/admin/orders/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }); loadOrders(); showToast('状态已更新'); }
+            catch (e) { showToast(e.message, true); }
+        }
+
+        async function loadUsers() {
+            try {
+                const users = await api('/admin/users');
+                document.getElementById('usersSection').innerHTML = `
+                    <div class="page-header"><h2>用户管理</h2></div>
+                    <div class="card">
+                        <table>
+                            <tr><th>ID</th><th>用户名</th><th>角色</th><th>手机号</th><th>地址</th></tr>
+                            ${users.map(u => `
+                                <tr>
+                                    <td>${u.id}</td><td>${u.username}</td>
+                                    <td><span class="badge ${u.role === 'admin' ? 'badge-purple' : 'badge-info'}">${u.role === 'admin' ? '管理员' : '顾客'}</span></td>
+                                    <td>${u.phone || '-'}</td><td>${u.address || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                `;
+            } catch (e) { showToast(e.message, true); }
+        }
+
+        function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+        async function modalSave() {
+            try { await modalCallback(); closeModal(); showToast('保存成功'); }
+            catch (e) { showToast(e.message, true); }
+        }
+    </script>
+</body>
+</html>
