@@ -5,93 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>网上订餐系统</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        :root {
+            --mint: #4FD1C5;
+            --mint-dark: #38B2AC;
+            --mint-glow: rgba(79,209,197,0.25);
+            --mint-light: rgba(79,209,197,0.08);
+            --coral: #ED64A6;
+            --coral-dark: #D53F8C;
+            --lavender: #9F7AEA;
+            --amber: #DD6B20;
+            --bg-dark: #F4F6FB;
+            --bg-card: #FFFFFF;
+            --bg-card-hover: #EDF2F7;
+            --bg-input: #EDF2F7;
+            --text-primary: #1A202C;
+            --text-secondary: #4A5568;
+            --text-muted: #A0AEC0;
+            --border: rgba(79,209,197,0.18);
+            --border-hover: rgba(79,209,197,0.35);
+            --glass-bg: rgba(255,255,255,0.72);
+            --glass-border: rgba(79,209,197,0.12);
+            --glass-blur: blur(20px);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-card: 0 2px 16px rgba(79,209,197,0.06);
+            --shadow-hover: 0 8px 32px rgba(79,209,197,0.10);
+            --gradient-main: linear-gradient(135deg, #4FD1C5, #38B2AC);
+            --gradient-warm: linear-gradient(135deg, #F687B3, #B794F6);
+            --gradient-amber: linear-gradient(135deg, #F6AD55, #F687B3);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; background: #f5f5f5; color: #333; }
-        .header { background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header h1 { font-size: 22px; font-weight: 600; }
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .btn { padding: 8px 18px; border: none; border-radius: 20px; cursor: pointer; font-size: 14px; transition: all 0.3s; font-weight: 500; }
-        .btn-primary { background: white; color: #ff6b35; }
-        .btn-primary:hover { background: #fff3ed; transform: translateY(-1px); }
-        .btn-danger { background: #ff4757; color: white; }
-        .btn-success { background: #2ed573; color: white; }
-        .btn-warning { background: #ffa502; color: white; }
-        .btn-sm { padding: 5px 12px; font-size: 12px; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        body { font-family: 'Inter', 'Microsoft YaHei', 'PingFang SC', sans-serif; background: var(--bg-dark); color: var(--text-primary); position: relative; overflow-x: hidden; min-height: 100vh; }
+        body::before { content: ''; position: fixed; top: -25%; left: -15%; width: 55vw; height: 55vw; background: radial-gradient(circle, rgba(79,209,197,0.12) 0%, transparent 65%); border-radius: 50%; z-index: 0; pointer-events: none; }
+        body::after { content: ''; position: fixed; bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(182,148,246,0.08) 0%, transparent 65%); border-radius: 50%; z-index: 0; pointer-events: none; }
+        .dot-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.06; background-image: radial-gradient(circle, var(--mint) 1px, transparent 1px); background-size: 30px 30px; }
+        .header { background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); color: var(--text-primary); padding: 16px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+        .header h1 { font-size: 20px; font-weight: 600; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .btn { padding: 8px 20px; border: none; border-radius: var(--radius-xl); cursor: pointer; font-size: 13px; transition: all 0.25s; font-weight: 500; letter-spacing: 0.3px; }
+        .btn-primary { background: var(--gradient-main); color: #fff; }
+        .btn-primary:hover { box-shadow: 0 4px 20px var(--mint-glow); transform: translateY(-1px); }
+        .btn-danger { background: linear-gradient(135deg, #FC8181, #F56565); color: #fff; }
+        .btn-success { background: var(--gradient-main); color: #fff; }
+        .btn-warning { background: var(--gradient-amber); color: #fff; }
+        .btn-sm { padding: 5px 14px; font-size: 12px; }
+        .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+        .btn-ghost:hover { border-color: var(--mint); color: var(--mint); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
         .main-layout { display: flex; gap: 20px; }
         .sidebar { width: 200px; flex-shrink: 0; }
-        .sidebar-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .sidebar-card h3 { font-size: 16px; margin-bottom: 12px; color: #666; }
+        .sidebar-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--border); }
+        .sidebar-card h3 { font-size: 13px; margin-bottom: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         .category-list { list-style: none; }
-        .category-list li { padding: 10px 15px; margin: 4px 0; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 14px; }
-        .category-list li:hover, .category-list li.active { background: #fff3ed; color: #ff6b35; font-weight: 600; }
+        .category-list li { padding: 10px 14px; margin: 3px 0; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; font-size: 14px; color: var(--text-secondary); }
+        .category-list li:hover { background: var(--mint-light); color: var(--mint); }
+        .category-list li.active { background: var(--mint-light); color: var(--mint); font-weight: 600; }
         .content { flex: 1; }
         .search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-bar input { flex: 1; padding: 10px 18px; border: 2px solid #eee; border-radius: 25px; font-size: 14px; outline: none; transition: border-color 0.3s; }
-        .search-bar input:focus { border-color: #ff6b35; }
-        .dish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
-        .dish-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.3s; }
-        .dish-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-        .dish-img { width: 100%; height: 160px; background: linear-gradient(135deg, #ffecd2, #fcb69f); display: flex; align-items: center; justify-content: center; font-size: 48px; overflow: hidden; }
+        .search-bar input { flex: 1; padding: 12px 20px; border: 1px solid var(--border); border-radius: var(--radius-xl); font-size: 14px; outline: none; background: var(--bg-card); color: var(--text-primary); transition: all 0.25s; }
+        .search-bar input::placeholder { color: var(--text-muted); }
+        .search-bar input:focus { border-color: var(--mint); box-shadow: 0 0 0 3px rgba(79,209,197,0.1); }
+        .dish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+        .dish-card { background: var(--bg-card); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); transition: all 0.3s; }
+        .dish-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--border-hover); }
+        .dish-img { width: 100%; height: 155px; background: linear-gradient(135deg, rgba(79,209,197,0.15), rgba(182,148,246,0.1)); display: flex; align-items: center; justify-content: center; font-size: 48px; overflow: hidden; }
         .dish-img img { width: 100%; height: 100%; object-fit: cover; }
-        .dish-info { padding: 15px; }
-        .dish-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-        .dish-desc { font-size: 12px; color: #999; margin-bottom: 10px; height: 32px; overflow: hidden; }
+        .dish-info { padding: 14px; }
+        .dish-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
+        .dish-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; height: 30px; overflow: hidden; }
         .dish-bottom { display: flex; justify-content: space-between; align-items: center; }
-        .dish-price { color: #ff4757; font-size: 20px; font-weight: 700; }
-        .dish-price::before { content: '¥'; font-size: 14px; }
-        .cart-panel { width: 320px; flex-shrink: 0; }
-        .cart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: sticky; top: 80px; }
-        .cart-card h3 { font-size: 18px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .cart-empty { text-align: center; padding: 30px; color: #ccc; }
-        .cart-empty span { font-size: 48px; display: block; margin-bottom: 10px; }
-        .cart-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .dish-price { color: #2C9E94; font-size: 20px; font-weight: 700; }
+        .dish-price::before { content: '¥'; font-size: 13px; }
+        .cart-panel { width: 310px; flex-shrink: 0; }
+        .cart-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border); position: sticky; top: 80px; }
+        .cart-card h3 { font-size: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+        .cart-empty { text-align: center; padding: 30px; color: var(--text-muted); }
+        .cart-empty span { font-size: 42px; display: block; margin-bottom: 10px; }
+        .cart-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .cart-item-info { flex: 1; }
-        .cart-item-name { font-size: 14px; font-weight: 500; }
-        .cart-item-price { font-size: 12px; color: #ff4757; }
+        .cart-item-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+        .cart-item-price { font-size: 12px; color: #2C9E94; }
         .cart-item-ctrl { display: flex; align-items: center; gap: 8px; }
-        .cart-item-ctrl button { width: 24px; height: 24px; border: 1px solid #ddd; border-radius: 50%; background: white; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
-        .cart-item-ctrl span { font-size: 14px; min-width: 20px; text-align: center; }
-        .cart-total { margin-top: 15px; padding-top: 15px; border-top: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; font-size: 18px; }
-        .cart-total .total-price { color: #ff4757; font-weight: 700; font-size: 22px; }
-        .cart-total .total-price::before { content: '¥'; font-size: 14px; }
-        .checkout-btn { width: 100%; margin-top: 15px; padding: 12px; background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,107,53,0.4); }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+        .cart-item-ctrl button { width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 50%; background: var(--bg-input); color: var(--text-secondary); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+        .cart-item-ctrl button:hover { border-color: var(--mint); color: var(--mint); background: var(--mint-light); }
+        .cart-item-ctrl span { font-size: 14px; min-width: 20px; text-align: center; color: var(--text-primary); }
+        .cart-total { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--text-secondary); }
+        .cart-total .total-price { color: #2C9E94; font-weight: 700; font-size: 22px; }
+        .cart-total .total-price::before { content: '¥'; font-size: 13px; }
+        .checkout-btn { width: 100%; margin-top: 15px; padding: 13px; background: var(--gradient-main); color: #fff; border: none; border-radius: var(--radius-xl); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.25s; letter-spacing: 0.5px; }
+        .checkout-btn:hover { box-shadow: 0 6px 24px var(--mint-glow); transform: translateY(-2px); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(244,246,251,0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; }
         .modal-overlay.show { display: flex; }
-        .modal { background: white; border-radius: 16px; padding: 30px; width: 400px; max-width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .modal h2 { margin-bottom: 20px; font-size: 20px; text-align: center; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; color: #666; }
-        .form-group input { width: 100%; padding: 10px 15px; border: 2px solid #eee; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.3s; }
-        .form-group input:focus { border-color: #ff6b35; }
-        .modal-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; border: none; border-radius: 25px; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        .user-info { font-size: 14px; color: white; }
-        .user-info span { margin-left: 8px; opacity: 0.9; }
-        .tab-bar { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 8px 20px; border: 2px solid #eee; background: white; border-radius: 20px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
-        .tab-btn.active { border-color: #ff6b35; color: #ff6b35; background: #fff3ed; }
+        .modal { background: var(--bg-card); border-radius: var(--radius-lg); padding: 30px; width: 400px; max-width: 90%; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(79,209,197,0.12); }
+        .modal h2 { margin-bottom: 24px; font-size: 20px; text-align: center; font-weight: 600; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .form-group input { width: 100%; padding: 11px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; outline: none; background: var(--bg-input); color: var(--text-primary); transition: all 0.2s; }
+        .form-group input::placeholder { color: var(--text-muted); }
+        .form-group input:focus { border-color: var(--mint); box-shadow: 0 0 0 3px rgba(79,209,197,0.1); }
+        .form-group input:disabled { opacity: 0.4; }
+        .modal-btn { width: 100%; padding: 12px; background: var(--gradient-main); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: all 0.25s; }
+        .modal-btn:hover { box-shadow: 0 4px 20px var(--mint-glow); }
+        .user-info { font-size: 14px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        .user-info span { color: var(--text-secondary); }
+        .user-menu { position: relative; }
+        .user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(79,209,197,0.1); min-width: 160px; z-index: 150; overflow: hidden; }
+        .user-dropdown.show { display: block; }
+        .user-dropdown-item { padding: 10px 16px; cursor: pointer; font-size: 13px; color: var(--text-secondary); transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
+        .user-dropdown-item:hover { background: var(--mint-light); color: var(--mint); }
+        .user-dropdown-item.danger { color: #E53E3E; }
+        .user-dropdown-item.danger:hover { background: rgba(229,62,62,0.08); }
+        .tab-bar { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { padding: 8px 22px; border: 1px solid var(--border); background: transparent; border-radius: var(--radius-xl); cursor: pointer; font-size: 13px; transition: all 0.2s; color: var(--text-muted); font-weight: 500; }
+        .tab-btn.active { border-color: var(--mint); color: var(--mint); background: var(--mint-light); }
+        .tab-btn:hover:not(.active) { border-color: var(--border-hover); color: var(--text-secondary); }
         .orders-section { display: none; }
         .orders-section.show { display: block; }
-        .order-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .order-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 20px; margin-bottom: 12px; border: 1px solid var(--border); }
         .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .order-id { font-weight: 600; }
-        .order-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-confirmed { background: #d1ecf1; color: #0c5460; }
-        .status-preparing { background: #e2d5f1; color: #6f42c1; }
-        .status-delivering { background: #d4edda; color: #155724; }
-        .status-completed { background: #cce5ff; color: #004085; }
-        .status-cancelled { background: #f8d7da; color: #721c24; }
-        .order-items { font-size: 13px; color: #666; }
-        .order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
-        .order-total { color: #ff4757; font-weight: 700; font-size: 18px; }
-        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: #2ed573; color: white; border-radius: 8px; z-index: 300; transform: translateX(120%); transition: transform 0.3s; font-size: 14px; }
+        .order-id { font-weight: 600; font-size: 14px; }
+        .order-status { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-pending { background: rgba(221,107,32,0.12); color: #DD6B20; }
+        .status-confirmed { background: var(--mint-light); color: #2C9E94; }
+        .status-preparing { background: rgba(128,90,213,0.12); color: #805AD5; }
+        .status-delivering { background: rgba(79,209,197,0.12); color: #2C9E94; }
+        .status-completed { background: rgba(79,209,197,0.15); color: #2C9E94; }
+        .status-cancelled { background: rgba(229,62,62,0.10); color: #E53E3E; }
+        .order-items { font-size: 13px; color: var(--text-muted); }
+        .order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+        .order-total { color: #2C9E94; font-weight: 700; font-size: 18px; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: var(--text-primary); border-radius: var(--radius-sm); z-index: 300; transform: translateX(120%); transition: transform 0.3s; font-size: 13px; border: 1px solid var(--border); }
         .toast.show { transform: translateX(0); }
-        .toast.error { background: #ff4757; }
+        .toast.error { border-color: rgba(229,62,62,0.2); color: #E53E3E; }
+        .auth-switch { color: #2C9E94; cursor: pointer; }
+        .auth-switch:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
+    <div class="dot-pattern"></div>
     <div class="header">
         <h1>🍽️ 网上订餐系统</h1>
         <div class="header-actions" id="headerActions"></div>
@@ -107,13 +161,13 @@
             <div class="main-layout">
                 <div class="sidebar">
                     <div class="sidebar-card">
-                        <h3>📋 菜品分类</h3>
+                        <h3>菜品分类</h3>
                         <ul class="category-list" id="categoryList"></ul>
                     </div>
                 </div>
                 <div class="content">
                     <div class="search-bar">
-                        <input type="text" id="searchInput" placeholder="🔍 搜索菜品..." oninput="searchDishes()">
+                        <input type="text" id="searchInput" placeholder="搜索菜品..." oninput="searchDishes()">
                     </div>
                     <div class="dish-grid" id="dishGrid"></div>
                 </div>
@@ -153,8 +207,8 @@
                 </div>
             </div>
             <button class="modal-btn" id="authSubmitBtn" onclick="submitAuth()">登录</button>
-            <p style="text-align:center;margin-top:15px;font-size:14px;color:#999">
-                <span id="authSwitch" onclick="toggleAuthMode()" style="cursor:pointer;color:#ff6b35"></span>
+            <p style="text-align:center;margin-top:15px;font-size:14px;color:var(--text-muted)">
+                <span id="authSwitch" class="auth-switch" onclick="toggleAuthMode()"></span>
             </p>
         </div>
     </div>
@@ -175,6 +229,25 @@
                 <input type="text" id="checkoutRemark" placeholder="如有特殊要求请备注">
             </div>
             <button class="modal-btn" onclick="submitOrder()">确认下单</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <h2>个人信息</h2>
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" id="profileUsername" disabled>
+            </div>
+            <div class="form-group">
+                <label>手机号</label>
+                <input type="text" id="profilePhone" placeholder="请输入手机号">
+            </div>
+            <div class="form-group">
+                <label>地址</label>
+                <input type="text" id="profileAddress" placeholder="请输入地址">
+            </div>
+            <button class="modal-btn" onclick="saveProfile()">保存</button>
         </div>
     </div>
 
@@ -221,15 +294,64 @@
             const el = document.getElementById('headerActions');
             if (currentUser) {
                 el.innerHTML = `
-                    <div class="user-info">👤 <span>${currentUser.username}</span></div>
-                    <button class="btn btn-primary btn-sm" onclick="showAuthModal()" style="display:none">登录</button>
-                    <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white" onclick="logout()">退出</button>
+                    <div class="user-menu">
+                        <div class="user-info" onclick="toggleUserMenu()" style="cursor:pointer">👤 <span>${currentUser.username}</span> ▾</div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-dropdown-item" onclick="showProfileModal()">👤 个人信息</div>
+                            <div class="user-dropdown-item danger" onclick="logout()">🚪 退出登录</div>
+                        </div>
+                    </div>
                 `;
             } else {
                 el.innerHTML = `
                     <button class="btn btn-primary btn-sm" onclick="showAuthModal()">登录</button>
-                    <button class="btn btn-primary btn-sm" onclick="showAuthModal(false)">注册</button>
+                    <button class="btn btn-ghost btn-sm" onclick="showAuthModal(false)">注册</button>
                 `;
+            }
+        }
+
+        function toggleUserMenu() {
+            const dd = document.getElementById('userDropdown');
+            dd.classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('userDropdown');
+            if (dd && !e.target.closest('.user-menu')) {
+                dd.classList.remove('show');
+            }
+        });
+
+        async function showProfileModal() {
+            const dd = document.getElementById('userDropdown');
+            if (dd) dd.classList.remove('show');
+            try {
+                const user = await api('/user');
+                document.getElementById('profileUsername').value = user.username || '';
+                document.getElementById('profilePhone').value = user.phone || '';
+                document.getElementById('profileAddress').value = user.address || '';
+            } catch (e) {
+                document.getElementById('profileUsername').value = currentUser.username || '';
+                document.getElementById('profilePhone').value = '';
+                document.getElementById('profileAddress').value = '';
+            }
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        async function saveProfile() {
+            const phone = document.getElementById('profilePhone').value.trim();
+            const address = document.getElementById('profileAddress').value.trim();
+            try {
+                await api('/user', {
+                    method: 'PUT',
+                    body: JSON.stringify({ phone, address })
+                });
+                currentUser.phone = phone;
+                currentUser.address = address;
+                document.getElementById('profileModal').classList.remove('show');
+                showToast('个人信息已更新');
+            } catch (e) {
+                showToast(e.message, true);
             }
         }
 
@@ -263,9 +385,13 @@
                     body: JSON.stringify(body)
                 });
                 token = data.token;
-                currentUser = data.user;
                 document.cookie = `token=${token};path=/;max-age=86400`;
                 document.getElementById('authModal').classList.remove('show');
+                try {
+                    currentUser = await api('/user');
+                } catch (_) {
+                    currentUser = data.user;
+                }
                 updateHeader();
                 loadCart();
                 showToast(isLoginMode ? '登录成功' : '注册成功');
@@ -316,7 +442,7 @@
             const el = document.getElementById('dishGrid');
             const available = dishes.filter(d => d.status);
             if (available.length === 0) {
-                el.innerHTML = '<p style="text-align:center;color:#999;padding:40px;grid-column:1/-1">暂无菜品</p>';
+                el.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;grid-column:1/-1">暂无菜品</p>';
                 return;
             }
             el.innerHTML = available.map(d => `
@@ -327,7 +453,7 @@
                         <div class="dish-desc">${d.desc || ''}</div>
                         <div class="dish-bottom">
                             <div class="dish-price">${d.price.toFixed(2)}</div>
-                            <button class="btn btn-primary btn-sm" onclick="addToCart(${d.id})">加入购物车</button>
+                            <button class="btn btn-primary btn-sm" onclick="addToCart(${d.id})">加入</button>
                         </div>
                     </div>
                 </div>
@@ -361,7 +487,7 @@
                 total += sub;
                 return `
                     <div class="cart-item">
-                        <img src="${item.dish.image || ''}" onerror="this.style.display='none'" style="width:40px;height:40px;border-radius:6px;object-fit:cover;margin-right:10px;flex-shrink:0">
+                        <img src="${item.dish.image || ''}" onerror="this.style.display='none'" style="width:40px;height:40px;border-radius:8px;object-fit:cover;margin-right:10px;flex-shrink:0">
                         <div class="cart-item-info">
                             <div class="cart-item-name">${item.dish.name}</div>
                             <div class="cart-item-price">¥${item.dish.price.toFixed(2)}</div>
@@ -370,7 +496,7 @@
                             <button onclick="updateCart(${item.id}, ${item.count - 1})">-</button>
                             <span>${item.count}</span>
                             <button onclick="updateCart(${item.id}, ${item.count + 1})">+</button>
-                            <button onclick="removeCart(${item.id})" style="border:none;color:#ff4757;font-size:16px">✕</button>
+                            <button onclick="removeCart(${item.id})" style="border:none;color:#E53E3E;font-size:16px;background:transparent">✕</button>
                         </div>
                     </div>
                 `;
@@ -410,8 +536,8 @@
         function showCheckout() {
             if (!getToken()) { showAuthModal(); return; }
             if (cart.length === 0) return showToast('购物车为空', true);
-            document.getElementById('checkoutPhone').value = '';
-            document.getElementById('checkoutAddress').value = '';
+            document.getElementById('checkoutPhone').value = currentUser?.phone || '';
+            document.getElementById('checkoutAddress').value = currentUser?.address || '';
             document.getElementById('checkoutRemark').value = '';
             document.getElementById('checkoutModal').classList.add('show');
         }
@@ -454,7 +580,7 @@
         function renderOrders(orders) {
             const el = document.getElementById('ordersList');
             if (orders.length === 0) {
-                el.innerHTML = '<p style="text-align:center;color:#999;padding:40px">暂无订单</p>';
+                el.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px">暂无订单</p>';
                 return;
             }
             el.innerHTML = orders.map(o => `

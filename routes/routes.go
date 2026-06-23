@@ -50,6 +50,7 @@ func SetupRouter() *gin.Engine {
 		admin.POST("/categories", controllers.CreateCategory)
 		admin.PUT("/categories/:id", controllers.UpdateCategory)
 		admin.DELETE("/categories/:id", controllers.DeleteCategory)
+		admin.GET("/dishes", controllers.ListDishes)
 		admin.POST("/dishes", controllers.CreateDish)
 		admin.PUT("/dishes/:id", controllers.UpdateDish)
 		admin.DELETE("/dishes/:id", controllers.DeleteDish)
